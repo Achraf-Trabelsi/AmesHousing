@@ -2,11 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from sklearn import neighbors
 from sklearn.model_selection import train_test_split
-
+from sklearn.preprocessing import OrdinalEncoder
 data=pd.read_csv("AmesHousing.csv")
-#understanding data
 
+#understanding data
 print(data.shape)
 print(data.columns)
 missing_values=data.isnull().sum().to_string()
@@ -17,7 +18,7 @@ print(col_missing)
 #cleaning data
 
 #dropping unuseful data (Total already gives as the info)
-data=data.drop(labels=['PID'],axis=1)
+data=data.drop(labels=['PID','Order'],axis=1)
 data=data.drop(labels=['BsmtFin SF 2', 'Bsmt Unf SF','BsmtFin SF 1'],axis=1)
 
 #droping because number missing is so high
@@ -41,11 +42,56 @@ data['Garage Cars'].fillna(value=0,inplace=True)
 data['Garage Area'].fillna(value=0,inplace=True)
 data['Mas Vnr Area'].fillna(value=data['Mas Vnr Area'].median(),inplace=True)
 #visualization
+
+data['SalePrice'].hist(bins=50, figsize=(5, 5))
+plt.show()
+plt.xlabel('SalePrice')
+
+data['Lot Frontage'].hist(bins=50, figsize=(5, 5))
+plt.xlabel('Lot Frontage')
+plt.show()
+
+log_Lot=np.log(data['Lot Frontage'])
+log_Lot.hist(bins=50, figsize=(5, 5))
+plt.xlabel('Lot log Frontage')
+plt.show()
+
+month=plt.scatter(data['Mo Sold'],data['SalePrice'])
+plt.xlabel('Mo sold')
+plt.ylabel('Sale Price')
+plt.show()
+year=plt.scatter(data['Yr Sold'],data['SalePrice'])
+plt.xlabel('Yr sold')
+plt.ylabel('Sale Price')
+plt.show()
+Lot=plt.scatter(data['Lot Frontage'],data['SalePrice'])
+plt.xlabel('Lot Frontage')
+plt.ylabel('Sale Price')
+plt.show()
+Lot=plt.scatter(log_Lot,data['SalePrice'])
+plt.xlabel('Lot Frontage')
+plt.ylabel('Sale Price')
+plt.show()
+neighbor=plt.bar(data['Neighborhood'],data['SalePrice'])
+plt.xlabel('Neighbor')
+plt.ylabel('Sale Price')
+plt.show()
+#features are irrelevant
+data=data.drop(labels=["Yr Sold","Mo Sold","Misc Val","Pool Area",
+"MS SubClass","Overall Cond","Bsmt Half Bath","3Ssn Porch",
+"Low Qual Fin SF","Low Qual Fin SF"],axis=1)
+
 corrMatrix = data.corr()
 sns.heatmap(corrMatrix, annot=True)
 plt.show()
 
+
 #train test 
 target=data.SalePrice
 d=data.drop(labels='SalePrice',axis=1)
-dtrain,dtest,ptrain,ptest=train_test_split(d,target,train_size=0.8,random_state=True)
+d_train,d_test,ptrain,ptest=train_test_split(d,target,train_size=0.8,random_state=True)
+
+#data preprocessiong
+enc=OrdinalEncoder()
+d_train=enc.fit_transform(d_train)
+d_test=enc.fit_transform(d_test)
