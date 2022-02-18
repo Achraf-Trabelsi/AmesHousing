@@ -5,7 +5,7 @@ import seaborn as sns
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OrdinalEncoder
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import accuracy_score, mean_squared_error
 data=pd.read_csv("AmesHousing.csv")
 
 #understanding data
@@ -110,6 +110,11 @@ d_test=enc.fit_transform(d_test)
 
 clf=LinearRegression()
 clf.fit(d_train,ptrain)
-clf.predict(d_test)
+pred=clf.predict(d_test)
 
+from sklearn.metrics import mean_absolute_error,mean_squared_error
+MAE_MLR=mean_absolute_error(ptest,pred)
+MSE_MLR=mean_squared_error(ptest,pred)
+RMSE_MLR=np.sqrt(MSE_MLR)
+print(pd.DataFrame([MAE_MLR, MSE_MLR, RMSE_MLR], index=['MAE_MLR', 'MSE_MLR', 'RMSE_MLR'], columns=['Metrics']))
 
